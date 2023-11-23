@@ -1,0 +1,5 @@
+**/bin
+**/obj
+.vs
+src/packages/**/*.pdb
+src/packages/**/*.nupkg
