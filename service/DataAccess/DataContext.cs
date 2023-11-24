@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Service.DataAccess
 {
-    class DataContext : DbContext
+    public class DataContext : DbContext
     {
         public string DbPath { get; }
         public DbSet<Interval> Intervals { get; set; }
