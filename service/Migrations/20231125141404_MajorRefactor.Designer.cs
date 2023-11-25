@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Service.DataAccess;
 
@@ -10,9 +11,11 @@ using Service.DataAccess;
 namespace service.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231125141404_MajorRefactor")]
+    partial class MajorRefactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -62,7 +65,7 @@ namespace service.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("IntervalId")
+                    b.Property<int?>("IntervalId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("LastRunTime")
@@ -113,14 +116,12 @@ namespace service.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("StatusId")
+                    b.Property<bool>("Success")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("JobId");
-
-                    b.HasIndex("StatusId");
 
                     b.ToTable("Results");
                 });
@@ -196,16 +197,6 @@ namespace service.Migrations
                         {
                             Id = 5,
                             Name = "Removed"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Completed"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Failed"
                         });
                 });
 
@@ -213,9 +204,7 @@ namespace service.Migrations
                 {
                     b.HasOne("Service.DataAccess.Interval", "Interval")
                         .WithMany("Jobs")
-                        .HasForeignKey("IntervalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IntervalId");
 
                     b.HasOne("Service.DataAccess.Platform", "Platform")
                         .WithMany()
@@ -244,15 +233,7 @@ namespace service.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Service.DataAccess.Status", "Status")
-                        .WithMany()
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Job");
-
-                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Service.DataAccess.Interval", b =>

@@ -6,7 +6,21 @@ namespace Service.DataAccess
     {
         public string DbPath { get; }
         public DbSet<Interval> Intervals { get; set; }
-        public DbSet<Task> Tasks { get; set; }
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<JobResult> Results { get; set; }
+        public DbSet<Platform> Platforms { get; set; }
+        public DbSet<Status> Status { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Status>().HasData(
+                SeedData.GetStatusSeedData()
+            );
+
+            modelBuilder.Entity<Platform>().HasData(
+                SeedData.GetPlatformSeedData()
+            );
+        }
 
         public DataContext()
         {
