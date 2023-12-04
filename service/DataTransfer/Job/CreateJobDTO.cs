@@ -1,4 +1,5 @@
 ﻿using Service.DataAccess;
+using Service.DataTransfer.Interval;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Service.DataTransfer.Job
         public string? Content { get; set; }
         public string? Parameters { get; set; }
         public string Creator { get; set; } = default!;
-        public int Interval { get; set; }
+        public CreateIntervalDTO Interval { get; set; } = default!;
         public int Priority { get; set; }
         public int Platform { get; set; }
     }

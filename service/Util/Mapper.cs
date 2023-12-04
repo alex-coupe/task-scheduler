@@ -25,7 +25,6 @@ namespace Service.Util
                     Id = interval.Id,
                     Minute = interval.Minute,
                     Month = interval.Month,
-                    Year = interval.Year,
                     Jobs = interval.Jobs?.Select(x => x.Name).ToList() ?? [""],
                 };
             }
@@ -42,7 +41,6 @@ namespace Service.Util
                 Id = x.Id,
                 Minute = x.Minute,
                 Month = x.Month,
-                Year = x.Year,
                 Jobs = x.Jobs?.Select(x => x.Name).ToList() ?? [""],
             }).ToList();
         }
@@ -55,8 +53,7 @@ namespace Service.Util
                 Minute = intervalDTO.Minute,
                 Day = intervalDTO.Day,
                 Hour = intervalDTO.Hour,
-                Month = intervalDTO.Month,
-                Year = intervalDTO.Year,
+                Month = intervalDTO.Month
             };
         }
 
@@ -88,30 +85,73 @@ namespace Service.Util
 
         public static Job MapCreateJobToJob(CreateJobDTO dto, DataContext context)
         {
-            var interval = context.Intervals.FirstOrDefault(x => x.Id == dto.Interval);
-            if (interval != null)
+            return new Job
             {
-                return new Job
-                {
-                    Content = dto.Content,
-                    Created = DateTime.Now,
-                    Creator = dto.Creator,
-                    Parameters = dto.Parameters,
-                    Path = dto.Path,
-                    Interval = interval,
-                    Name = dto.Name,
-                    Platform = context.Platforms.FirstOrDefault(x => x.Id == dto.Platform)!,
-                    Priority = dto.Priority,
-                    Status = context.Status.FirstOrDefault(x => x.Id == (int)Enums.STATUS.Pending)!,
-                    NextRunTime = DetermineNextRunTime(interval)
-                };
-            }
-            return new Job();
+                Content = dto.Content,
+                Created = DateTime.Now,
+                Creator = dto.Creator,
+                Parameters = dto.Parameters,
+                Path = dto.Path,
+                Interval = MapCreateIntervalToInterval(dto.Interval),
+                Name = dto.Name,
+                Platform = context.Platforms.FirstOrDefault(x => x.Id == dto.Platform)!,
+                Priority = dto.Priority,
+                Status = context.Status.FirstOrDefault(x => x.Id == (int)Enums.STATUS.Pending)!,
+                NextRunTime = DetermineNextRunTime(dto.Interval, DateTime.Now)
+                };  
         }
 
-        private static DateTime DetermineNextRunTime(Interval interval)
+        public static IEnumerable<ReadJobDTO> MapJobsToReadDTOs(IEnumerable<Job> jobs)
         {
-            return DateTime.Now;
+            return jobs.Select(x => new ReadJobDTO
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Parameters = x.Parameters,
+                Path = x.Path,
+                Content = x.Content,
+                Created = x.Created,
+                Creator = x.Creator,
+                Interval = $"{x.Interval.Second} {x.Interval.Minute} {x.Interval.Hour} {x.Interval.Day} {x.Interval.Month}",
+                LastRunTime = x.LastRunTime,
+                NextRunTime = x.NextRunTime,
+                Platform = x.Platform.Name,
+                Priority = x.Priority,
+                Results = MapJobResultsToReadDTOs(x.Id,new DataContext()),
+                Status = x.Status.Name
+            });
+        }
+
+        public static void MapUpdateJobToJob(UpdateJobDTO updateJob, Job job)
+        {
+            using var context = new DataContext();
+            job.Status = context.Status.FirstOrDefault(x => x.Id == updateJob.Status);
+            job.Interval = context.Intervals.FirstOrDefault(x => x.Id == updateJob.Id);
+            job.Name = updateJob.Name;
+            job.Parameters = updateJob.Parameters;
+            job.Path = updateJob.Path;
+            job.Content = updateJob.Content;
+            job.Priority = updateJob.Priority;
+            job.Platform = context.Platforms.FirstOrDefault(x => x.Id == updateJob.Platform);
+
+        }
+
+        private static DateTime DetermineNextRunTime(CreateIntervalDTO interval, DateTime current)
+        {
+            return current.AddSeconds(GetIntervalValue(interval.Second))
+                .AddMinutes(GetIntervalValue(interval.Minute))
+                .AddDays(GetIntervalValue(interval.Day))
+                .AddMonths(GetIntervalValue(interval.Month));
+        }
+
+        private static int GetIntervalValue(string interval)
+        {
+            if (interval == "*") return 1;
+
+            if (interval.StartsWith("/*")) return int.Parse(interval[2..]);
+
+            return int.Parse(interval);
+
         }
     }
 }

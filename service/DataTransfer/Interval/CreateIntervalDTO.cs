@@ -8,11 +8,10 @@ namespace Service.DataTransfer.Interval
 {
     public class CreateIntervalDTO
     {
-        public int Second { get; set; }
-        public int Minute { get; set; }
-        public int Hour { get; set; }
-        public int Day { get; set; }
-        public int Month { get; set; }
-        public int Year { get; set; }
+        public string Second { get; set; } = default!;
+        public string Minute { get; set; } = default!;
+        public string Hour { get; set; } = default!;
+        public string Day { get; set; } = default!;
+        public string Month { get; set; } = default!;
     }
 }

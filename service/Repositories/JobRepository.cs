@@ -1,4 +1,5 @@
-﻿using Service.DataAccess;
+﻿using Microsoft.EntityFrameworkCore;
+using Service.DataAccess;
 using Service.DataTransfer.Job;
 using Service.Repositories.Interfaces;
 using Service.Util;
@@ -26,22 +27,28 @@ namespace Service.Repositories
 
         public IEnumerable<ReadJobDTO> GetAllJobs()
         {
-            throw new NotImplementedException();
+            return Mapper.MapJobsToReadDTOs(_context.Jobs.ToList());
         }
 
         public IEnumerable<ReadJobDTO> GetJobsByPlatform(int platformId)
         {
-            throw new NotImplementedException();
+            return Mapper.MapJobsToReadDTOs(_context.Jobs.Where(x => x.Platform.Id == platformId).ToList());
         }
 
         public IEnumerable<ReadJobDTO> GetJobsByStatus(int statusId)
         {
-            throw new NotImplementedException();
+            return Mapper.MapJobsToReadDTOs(_context.Jobs.Where(x => x.Status.Id == statusId).ToList());
         }
 
-        public void UpdateJob(UpdateJobDTO job)
+        public async Task UpdateJob(UpdateJobDTO job)
         {
-            throw new NotImplementedException();
+            var jobToUpdate = _context.Jobs.FirstOrDefault(x => x.Id == job.Id);
+            if (jobToUpdate != null)
+            {
+                Mapper.MapUpdateJobToJob(job,jobToUpdate);
+                _context.Entry(job).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
