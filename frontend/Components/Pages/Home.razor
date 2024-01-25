@@ -1,0 +1,67 @@
+﻿@page "/"
+@using Service.DataTransfer.Job
+@using Service.Repositories.Interfaces
+@using System.Globalization
+@inject IJobRepository _jobRepository
+
+<PageTitle>Dashboard</PageTitle>
+
+<h1>Job Dashboard</h1>
+
+@if (jobs.Any())
+{
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Creator</th>
+                <th>Created</th>
+                <th>Last Run Time</th>
+                <th>Next Run Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var job in jobs)
+            {
+                <tr>
+                    <td>@job.Id</td>
+                    <td><NavLink class="btn btn-primary" href="@($"/jobs/edit/{job.Id}")">@job.Name</NavLink></td>
+                        <td>@job.Creator</td>
+                    <td>@job.Created.ToString(new CultureInfo("en-GB"))</td>
+                    <td>@job.LastRunTime?.ToString(new CultureInfo("en-GB"))</td>
+                    <td>@job.NextRunTime.ToString(new CultureInfo("en-GB"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>No Jobs Found</h3>
+}
+
+<NavLink class="btn btn-primary" href="@($"/jobs/create")">New Job</NavLink>
+
+<p>@Error</p>
+
+@code {
+    private string Error { get; set; }
+
+    IEnumerable<ReadJobDTO> jobs;
+
+    protected override void OnInitialized()
+    {
+        jobs = new List<ReadJobDTO>();
+        try
+        {
+            jobs = _jobRepository.GetAllJobs();
+
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+
+    }
+}

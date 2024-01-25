@@ -125,15 +125,32 @@ namespace Service.Util
         public static void MapUpdateJobToJob(UpdateJobDTO updateJob, Job job)
         {
             using var context = new DataContext();
-            job.Status = context.Status.FirstOrDefault(x => x.Id == updateJob.Status);
-            job.Interval = context.Intervals.FirstOrDefault(x => x.Id == updateJob.Id);
+            job.Status = context.Status.FirstOrDefault(x => x.Id == updateJob.Status)!;
+            job.Interval = context.Intervals.FirstOrDefault(x => x.Id == updateJob.Id)!;
             job.Name = updateJob.Name;
             job.Parameters = updateJob.Parameters;
             job.Path = updateJob.Path;
             job.Content = updateJob.Content;
             job.Priority = updateJob.Priority;
-            job.Platform = context.Platforms.FirstOrDefault(x => x.Id == updateJob.Platform);
+            job.Platform = context.Platforms.FirstOrDefault(x => x.Id == updateJob.Platform)!;
 
+        }
+
+       
+        public static UpdateJobDTO MapJobToUpdateDTO(Job job)
+        {
+            using var context = new DataContext();
+            return new UpdateJobDTO
+            {
+                Status = job.Status.Id,
+                IntervalId = job.Interval.Id,
+                Name = job.Name,
+                Parameters = job.Parameters,
+                Path = job.Path,
+                Content = job.Content,
+                Priority = job.Priority,
+                Platform = job.Platform.Id
+            };
         }
 
         private static DateTime DetermineNextRunTime(CreateIntervalDTO interval, DateTime current)

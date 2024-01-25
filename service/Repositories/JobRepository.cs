@@ -30,6 +30,12 @@ namespace Service.Repositories
             return Mapper.MapJobsToReadDTOs(_context.Jobs.ToList());
         }
 
+        public async Task<UpdateJobDTO> GetJobById(int jobId)
+        {
+            var job = await _context.Jobs.FirstOrDefaultAsync(x => x.Id == jobId);
+            return Mapper.MapJobToUpdateDTO(job);
+        }
+
         public IEnumerable<ReadJobDTO> GetJobsByPlatform(int platformId)
         {
             return Mapper.MapJobsToReadDTOs(_context.Jobs.Where(x => x.Platform.Id == platformId).ToList());

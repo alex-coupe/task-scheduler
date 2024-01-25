@@ -10,14 +10,10 @@ using System.Threading.Tasks;
 
 namespace Service.Repositories
 {
-    public class IntervalRepository : IIntervalRepository
+    public class IntervalRepository(DataContext context) : IIntervalRepository
     {
-        private readonly DataContext _context;
-
-        public IntervalRepository() 
-        {
-            _context = new DataContext();
-        }
+        private readonly DataContext _context = context
+;
         public async Task CreateInterval(CreateIntervalDTO intervalDTO)
         {
             _context.Intervals.Add(Mapper.MapCreateIntervalToInterval(intervalDTO));

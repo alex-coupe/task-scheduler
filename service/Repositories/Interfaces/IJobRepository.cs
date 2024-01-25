@@ -7,6 +7,8 @@ namespace Service.Repositories.Interfaces
         public IEnumerable<ReadJobDTO> GetAllJobs();
         public IEnumerable<ReadJobDTO> GetJobsByPlatform(int platformId);
         public IEnumerable<ReadJobDTO> GetJobsByStatus(int statusId);
+
+        public Task<UpdateJobDTO> GetJobById(int jobId);
         public Task UpdateJob(UpdateJobDTO job);
         public Task CreateJob(CreateJobDTO job);
     }
